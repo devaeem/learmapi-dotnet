@@ -1,11 +1,19 @@
 {
   "Version": 1,
-  "Hash": "wu/yiGD+mc/ywSO1Y77cbk+8xzInuDBBomQ8cUaAcPg=",
+  "Hash": "KiYXt2BfzAdUFlChZo9qVaAYdlShNs8NodM5sm1H44c=",
   "Source": "LearmApi",
   "BasePath": "_content/LearmApi",
   "Mode": "Default",
   "ManifestType": "Build",
   "ReferencedProjectsConfiguration": [],
-  "DiscoveryPatterns": [],
+  "DiscoveryPatterns": [
+    {
+      "Name": "LearmApi\\wwwroot",
+      "Source": "LearmApi",
+      "ContentRoot": "D:\\devaeem\\workshop\\LearmApi\\LearmApi\\wwwroot\\",
+      "BasePath": "_content/LearmApi",
+      "Pattern": "**"
+    }
+  ],
   "Assets": []
 }

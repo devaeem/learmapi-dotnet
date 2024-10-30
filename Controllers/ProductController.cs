@@ -13,9 +13,15 @@ namespace LearmApi.Controllers
     {
         private readonly EntityContext _context;
 
-        public ProductController(EntityContext context)
+
+        private readonly IWebHostEnvironment _env;
+
+        public ProductController(EntityContext context, IWebHostEnvironment env)
         {
             _context = context;
+            _env = env;
+
+
         }
 
         [HttpGet]
@@ -109,11 +115,16 @@ namespace LearmApi.Controllers
 
         [HttpPost]
         [Route("create-product")]
-        public async Task<IActionResult> CreateProduct([FromBody] ProductDto product)
+        public async Task<IActionResult> CreateProduct([FromForm] ProductDto product, IFormFile? image)
         {
             try
 
             {
+
+                // Declare fileName here
+
+
+
 
                 var category = await _context.Categories.FindAsync(product.CategoryId);
                 if (category == null)
@@ -125,12 +136,32 @@ namespace LearmApi.Controllers
                     Name = product.Name,
                     Price = product.Price,
                     Description = product.Description,
-                    Image = product.Image,
                     CategoryId = category,
 
                 };
 
                 await _context.Products.AddAsync(data);
+
+                if (image != null)
+                {
+                    string fileName = Guid.NewGuid().ToString() + Path.GetExtension(image.FileName);
+
+                    string uploadFolder = Path.Combine(_env.WebRootPath, "uploads/images");
+                    if (!Directory.Exists(uploadFolder))
+                    {
+                        Directory.CreateDirectory(uploadFolder);
+                    }
+                    var filePath = Path.Combine(_env.WebRootPath, "uploads/images", fileName);
+                    using (var stream = new FileStream(filePath, FileMode.Create))
+                    {
+                        await image.CopyToAsync(stream);
+                    }
+                    data.Image = fileName;
+                }
+                else
+                {
+                    data.Image = "no-image.jpg";
+                }
                 await _context.SaveChangesAsync();
 
 
@@ -139,7 +170,7 @@ namespace LearmApi.Controllers
             catch (Exception ex)
             {
 
-                return StatusCode(500, "Internal server error");
+                return StatusCode(500, $"Internal server error:{ex.Message}");
             }
         }
 
@@ -160,7 +191,7 @@ namespace LearmApi.Controllers
                 productExist.Name = product.Name;
                 productExist.Price = product.Price;
                 productExist.Description = product.Description;
-                productExist.Image = product.Image;
+                // productExist.Image = product.Image;
                 //productExist.CategoryId = product.CategoryId;
                 productExist.UpdatedDate = DateTime.UtcNow;
 
